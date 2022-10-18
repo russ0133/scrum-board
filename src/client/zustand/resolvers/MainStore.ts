@@ -22,6 +22,7 @@ const useMainStore = create<MainInterface>((set) => ({
     }));
     Cookies.set('authStatus', 'true');
   },
+
   logout: () => {
     set((state) => ({
       userData: { ...state.userData, loggedIn: false } as MainModel,
