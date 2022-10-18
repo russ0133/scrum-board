@@ -11,6 +11,8 @@ interface MainInterface {
   removeTask: (id: string) => void;
   updateTaskName: (id: string, name: string) => void;
   updateTaskColumn: (id: string, name: string) => void;
+  reorderTask: (id: string, sourceIndex: number, destinationIndex: number) => void;
+  updateTaskByParam: (id: string, param: string, data: any) => void;
   /*   removeTodo: (id: string) => void;
   toggleCompletedState: (id: string) => void; */
 }
@@ -25,6 +27,49 @@ const useMainStore = create<MainInterface>((set, get) => ({
     set((state) => ({
       userData: { ...state.userData, tasks } as MainModel,
     }));
+  },
+
+  updateTaskByParam: (id: string, param: string, data: any) => {
+    const { tasks } = get().userData;
+    if (!tasks) return console.error('No task found with this ID.');
+
+    const newTasks = tasks.map((t) => {
+      if (t.taskId === id) {
+        const mutatedTask = t;
+        // @ts-ignore
+        mutatedTask[param] = data;
+        return mutatedTask;
+      }
+      return t;
+    });
+
+    set((state) => ({
+      userData: { ...state.userData, newTasks } as MainModel,
+    }));
+
+    console.log(tasks);
+  },
+
+  reorderTask: async (id: string, sourceIndex: number, destinationIndex: number) => {
+    //  FIXME: Update firebase with new reordered tasks
+    const { tasks } = get().userData;
+    if (!tasks) return console.error('No task found with this ID.');
+
+    const reorderedTask = tasks.find((store) => store.taskId === id);
+    const reorderedTasks = tasks;
+    if (reorderedTask) {
+      reorderedTask.index = destinationIndex;
+
+      reorderedTasks.splice(sourceIndex, 1);
+      reorderedTasks.splice(destinationIndex, 0, reorderedTask);
+      reorderedTasks.forEach((task, index) => {
+        task.index = index;
+      });
+
+      set((state) => ({
+        userData: { ...state.userData, tasks: reorderedTasks } as MainModel,
+      }));
+    }
   },
 
   updateTaskName: (id: string, newName: string) => {

@@ -16,14 +16,24 @@ async function getAllTasksFromUid(ownerId: string) {
 async function addTask(ownerId: string, name: string, column: string, status: boolean) {
   try {
     const Collection = collection(db, 'tasks');
-    const Mutation = await addDoc(Collection, { ownerId, name, column, status, taskId: uuidv4() });
+    const Mutation = await addDoc(Collection, { ownerId, name, column, status, taskId: uuidv4(), index: 0 });
     return Mutation;
   } catch (err) {
     return err;
   }
 }
 
-async function updateTask(taskId: string, parameter: string, value: string) {
+async function updateAllTasksIndex(tasks: Task[], ownerId: string) {
+  try {
+    const Collection = collection(db, 'tasks');
+    const Query = query(Collection, where('ownerId', '==', ownerId));
+    const Snapshot = await getDocs(Query);
+    Snapshot.docs.map((docx) => docx.data());
+  } catch (err) {
+    return err;
+  }
+}
+async function updateTask(taskId: string, parameter: string, value: any) {
   try {
     const Collection = collection(db, 'tasks');
     const Query = query(Collection, where('taskId', '==', taskId));

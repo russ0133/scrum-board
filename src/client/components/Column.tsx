@@ -14,14 +14,14 @@ function Column({ name }: ColumnInterface) {
 
   if (taskStore)
     return (
-      <div>
-        <h2>{name}</h2>
+      <div className="col-span-1 bg-blue-500 flex flex-col  w-[100%]">
         <Droppable droppableId={name}>
           {(provided) => (
-            <div className="flex flex-col items-center text-white  w-full h-52" data-testid="dustbin">
+            <div className="bg-green-500">
+              <h2>{name}</h2>
               <ul className="characters" {...provided.droppableProps} ref={provided.innerRef}>
                 {taskStore.map((task, index) => {
-                  if (task.column === name) return <TaskCard task={task} index={index} />;
+                  if (task.column === name) return <TaskCard key={task.taskId} task={task} index={task.index} />;
                   return null;
                 })}
                 {provided.placeholder}

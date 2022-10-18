@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { DragDropContext } from '@hello-pangea/dnd';
+import { DragDropContext, OnDragEndResponder } from '@hello-pangea/dnd';
 import { Task } from './zustand/models/MainModel';
 
 import useMainStore from './zustand/resolvers/MainStore';
@@ -14,13 +14,11 @@ export default function Home() {
   const queryCollections = async () => {
     if (!authStore.userData.uid) return;
     const cities = await getAllTasksFromUid(authStore.userData.uid);
-    console.log(cities);
   };
 
   const addDocument = async () => {
     if (!authStore.userData.uid) return;
     const cities = await addTask(authStore.userData.uid, 'Test', 'todo', false);
-    console.log(cities);
   };
 
   useEffect(() => {
@@ -28,13 +26,18 @@ export default function Home() {
       if (!authStore.userData.uid) return;
       const tasks = await getAllTasksFromUid(authStore.userData.uid);
       authStore.setTasks(tasks as Task[]);
-      console.log(tasks);
     }
     getAllTasksOnInit();
   }, []);
 
   const onDragEnd = (result: any) => {
-    console.log(result);
+    const { destination, source, draggableId } = result;
+
+    if (!destination) return console.error('no destination');
+    if (!authStore.userData.tasks) return console.error('no tasks');
+    if (destination.droppableId === source.droppableId && destination.index === source.index)
+      return console.error('wat');
+    authStore.reorderTask(draggableId, source.index, destination.index);
   };
 
   return (
@@ -52,15 +55,14 @@ export default function Home() {
         </button>
       </div>
       <h1>App section</h1>
-      <DragDropContext onDragStart={console.log} onDragEnd={onDragEnd}>
-        <div className="">
-          <div className="grid grid-cols-3 bg-red-500 gap-4">
-            <Column name="todo" />
-            <Column name="backlog" />
-            <Column name="hello" />
-          </div>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="grid grid-cols-3 bg-red-500 gap-12">
+          <Column name="todo" />
+          <Column name="backlog" />
+          <Column name="hello" />
         </div>
       </DragDropContext>
+      <div>{authStore.userData.tasks && JSON.stringify(authStore.userData.tasks, null, 2)}</div>
     </>
   );
 }
