@@ -1,7 +1,7 @@
 import create from 'zustand';
 
 import { MainModel, Task } from '../models/MainModel';
-import { removeTask, updateTask } from '../../../server/resolvers/TaskResolver';
+import { removeTask, updateAllTasksIndexes, updateTask } from '../../../server/resolvers/TaskResolver';
 
 interface MainInterface {
   userData: MainModel;
@@ -51,24 +51,28 @@ const useMainStore = create<MainInterface>((set, get) => ({
   },
 
   reorderTask: async (id: string, sourceIndex: number, destinationIndex: number) => {
-    //  FIXME: Update firebase with new reordered tasks
     const { tasks } = get().userData;
     if (!tasks) return console.error('No task found with this ID.');
 
     const reorderedTask = tasks.find((store) => store.taskId === id);
     const reorderedTasks = tasks;
     if (reorderedTask) {
-      reorderedTask.index = destinationIndex;
+      reorderedTask.order = destinationIndex;
 
       reorderedTasks.splice(sourceIndex, 1);
       reorderedTasks.splice(destinationIndex, 0, reorderedTask);
       reorderedTasks.forEach((task, index) => {
-        task.index = index;
+        task.order = index;
       });
 
       set((state) => ({
         userData: { ...state.userData, tasks: reorderedTasks } as MainModel,
       }));
+
+      setTimeout(() => {
+        updateAllTasksIndexes(reorderedTasks);
+        console.log('Updated store.');
+      }, 1000);
     }
   },
 

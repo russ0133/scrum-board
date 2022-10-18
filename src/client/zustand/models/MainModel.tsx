@@ -6,7 +6,7 @@ export interface MainModel {
 
 export interface Task {
   name: string;
-  index: number;
+  order: number;
   column: string;
   status: boolean;
   taskId: string;

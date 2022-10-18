@@ -1,7 +1,6 @@
-import React, { CSSProperties, FC } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import { Droppable, Draggable } from '@hello-pangea/dnd';
-import ItemTypes from '../Constants';
+import React from 'react';
+import { Droppable } from '@hello-pangea/dnd';
+import { Divider } from '@mantine/core';
 import useMainStore from '../zustand/resolvers/MainStore';
 import TaskCard from './TaskCard';
 
@@ -14,19 +13,18 @@ function Column({ name }: ColumnInterface) {
 
   if (taskStore)
     return (
-      <div className="col-span-1 bg-blue-500 flex flex-col  w-[100%]">
+      <div className="col-span-1 bg-gray-100 shadow-md  rounded-sm flex flex-col w-[100%] my-12 mr">
+        <div className="rounded-t-xl text-xl px-4 bg-neutral-700 font-bold text-white">{name}</div>
+        <Divider />
         <Droppable droppableId={name}>
           {(provided) => (
-            <div className="bg-green-500">
-              <h2>{name}</h2>
-              <ul className="characters" {...provided.droppableProps} ref={provided.innerRef}>
-                {taskStore.map((task, index) => {
-                  if (task.column === name) return <TaskCard key={task.taskId} task={task} index={task.index} />;
-                  return null;
-                })}
-                {provided.placeholder}
-              </ul>
-            </div>
+            <ul className="characters" {...provided.droppableProps} ref={provided.innerRef}>
+              {taskStore.map((task) => {
+                if (task.column === name) return <TaskCard key={task.taskId} task={task} />;
+                return null;
+              })}
+              {provided.placeholder}
+            </ul>
           )}
         </Droppable>
       </div>

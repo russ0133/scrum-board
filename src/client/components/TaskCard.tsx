@@ -1,30 +1,24 @@
 import React from 'react';
-import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
 
 import { Draggable } from '@hello-pangea/dnd';
-import ItemTypes from '../Constants';
 import { Task } from '../zustand/models/MainModel';
-import useMainStore from '../zustand/resolvers/MainStore';
 
 interface TaskCardProp {
   task: Task;
-  index: number;
 }
 
-function TaskCard({ task, index }: TaskCardProp) {
+function TaskCard({ task }: TaskCardProp) {
   return (
-    <div className="w-[100%] bg-red-200 item-start">
-      <Draggable key={task.taskId} draggableId={task.taskId} index={index}>
+    <div className="px-4 rounded-xl">
+      <Draggable key={task.taskId} draggableId={task.taskId} index={task.order}>
         {(provided) => (
           <div
-            className="w-[100%] bg-red-200 item-start"
+            className="w-[100%] mt-2 bg-white rounded-xl shadow p-2"
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
           >
-            <Text weight={500}>
-              {task.name}: {index}
-            </Text>
+            {task.name}: {task.order}
           </div>
         )}
       </Draggable>

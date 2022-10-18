@@ -11,6 +11,8 @@
     "no-console": "off",
     "react/jsx-props-no-spreading": "off",
     "no-param-reassign": "off",
+    "import/no-cycle": "off",
+    "no-await-in-loop": "off",
     "consistent-return": "off",
     "import/extensions": [
       "error",
