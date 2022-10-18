@@ -3,14 +3,18 @@ import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
 
 import { useDrag } from 'react-dnd';
 import ItemTypes from '../Constants';
+import { Task } from '../zustand/models/MainModel';
+import useMainStore from '../zustand/resolvers/MainStore';
 
-interface TasksProps {
-  name: string;
+interface TaskCardProp {
+  task: Task;
 }
 interface DropResult {
   name: string;
 }
-function TaskCard({ name }: TasksProps) {
+function TaskCard({ task }: TaskCardProp) {
+  const { name } = task;
+  const taskStore = useMainStore();
   const [{ isDragging }, drag] = useDrag(() => ({
     type: ItemTypes.CARD,
     item: { name },
@@ -25,10 +29,14 @@ function TaskCard({ name }: TasksProps) {
       handlerId: monitor.getHandlerId(),
     }),
   }));
+
+  const onRemove = () => {
+    taskStore.removeTask(task.taskId);
+  };
   return (
     <Card shadow="sm" p="lg" radius="md" withBorder ref={drag}>
       <Group position="apart" mt="md" mb="xs">
-        <Text weight={500}>{name}</Text>
+        <Text weight={500}>{task.name}</Text>
       </Group>
 
       <Text size="sm" color="dimmed">
@@ -36,8 +44,8 @@ function TaskCard({ name }: TasksProps) {
         the fjords of Norway
       </Text>
 
-      <Button variant="light" color="blue" fullWidth mt="md" radius="md">
-        Book classic tour now
+      <Button color="red" fullWidth mt="md" radius="md" onClick={onRemove}>
+        Delete
       </Button>
     </Card>
   );

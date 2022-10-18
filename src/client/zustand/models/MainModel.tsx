@@ -8,4 +8,5 @@ export interface Task {
   name: string;
   column: string;
   status: boolean;
+  taskId: string;
 }

@@ -3,8 +3,9 @@ import { TextInput, PasswordInput, Button, Group, Box } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useNavigate } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth, logInWithEmailAndPassword } from '../server/firebase';
+import { auth } from '../server/firebase';
 import useMainStore from './zustand/resolvers/MainStore';
+import { logInWithEmailAndPassword } from '../server/resolvers/AuthResolver';
 
 function Login() {
   const authStore = useMainStore();

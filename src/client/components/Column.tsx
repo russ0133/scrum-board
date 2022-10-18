@@ -22,7 +22,7 @@ interface ColumnInterface {
 function Column({ name }: ColumnInterface) {
   const [{ canDrop, isOver }, drop] = useDrop(() => ({
     accept: ItemTypes.CARD,
-    drop: () => ({ name: 'Dustbin' }),
+    drop: () => ({ name }),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),

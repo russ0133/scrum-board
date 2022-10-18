@@ -1,7 +1,7 @@
 import React from 'react';
 import { TextInput, PasswordInput, Button, Group, Box } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { registerWithEmailAndPassword } from '../server/firebase';
+import { registerWithEmailAndPassword } from '../server/resolvers/AuthResolver';
 
 function Register() {
   const form = useForm({

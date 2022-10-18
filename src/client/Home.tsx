@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { useDrop } from 'react-dnd';
-import { addTask, getAllTasksFromUid, logout } from '../server/firebase';
 import TaskCard from './components/TaskCard';
 import { Task } from './zustand/models/MainModel';
 
 import useMainStore from './zustand/resolvers/MainStore';
-import ItemTypes from './Constants';
 import Column from './components/Column';
+import { logout } from '../server/resolvers/AuthResolver';
+import { getAllTasksFromUid, addTask } from '../server/resolvers/TaskResolver';
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -30,6 +29,7 @@ export default function Home() {
       if (!authStore.userData.uid) return;
       const tasks = await getAllTasksFromUid(authStore.userData.uid);
       authStore.setTasks(tasks as Task[]);
+      console.log(tasks);
       setLoading(false);
     }
     getAllTasksOnInit();
@@ -38,6 +38,7 @@ export default function Home() {
   return (
     <>
       <div className=" flex flex-col items-center gap-2">
+        <h1>Debug section</h1>
         <button type="button" className="bg-blue-500 text-white" onClick={queryCollections}>
           Click here to show collection!
         </button>
@@ -47,20 +48,24 @@ export default function Home() {
         <button type="button" className="bg-red-500 text-white" onClick={logout}>
           Click here to log off!
         </button>
-        <div>Heres your tasks:</div>
       </div>
-      <div className="grid grid-cols-3 bg-red-500 gap-4">
-        <div>
-          <Column name="todos" />
+      <h1>App section</h1>
+      <div className="">
+        <div className="grid grid-cols-3 bg-red-500 gap-4">
+          <div className="bg-red-200">
+            <Column name="todos" />
+          </div>
+          <Column name="done" />
+          <Column name="backlog" />
         </div>
         <div>
-          <h1>Todo</h1>
+          <h1>Unasigned tasks</h1>
           {loading ? (
             <div>Loading tasks...</div>
           ) : (
             authStore.userData.tasks?.map((task) => (
               <div key={uuidv4()} className="px-16 py-2">
-                <TaskCard name={task.name} />
+                <TaskCard task={task} />
               </div>
             ))
           )}

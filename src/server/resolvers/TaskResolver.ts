@@ -1,0 +1,37 @@
+import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
+import { db } from '../firebase';
+
+// Queries
+async function getAllTasksFromUid(ownerId: string) {
+  const Collection = collection(db, 'tasks');
+  const Query = query(Collection, where('ownerId', '==', ownerId));
+  const Snapshot = await getDocs(Query);
+  const Data = Snapshot.docs.map((docx) => docx.data());
+  return Data;
+}
+
+// Mutations
+async function addTask(ownerId: string, name: string, column: string, status: boolean) {
+  try {
+    const Collection = collection(db, 'tasks');
+    const Mutation = await addDoc(Collection, { ownerId, name, column, status, taskId: uuidv4() });
+    return Mutation;
+  } catch (err) {
+    return err;
+  }
+}
+
+async function removeTask(taskId: string) {
+  try {
+    const Collection = collection(db, 'tasks');
+    const Query = query(Collection, where('taskId', '==', taskId));
+    const Snapshot = await getDocs(Query);
+    Snapshot.docs.map((document) => deleteDoc(document.ref));
+    return true;
+  } catch (err) {
+    return err;
+  }
+}
+
+export { getAllTasksFromUid, addTask, removeTask };
