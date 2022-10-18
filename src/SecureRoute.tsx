@@ -1,27 +1,23 @@
-import Cookies from 'js-cookie';
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useMainStore from './zustand/resolvers/MainStore';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from './server/firebase';
 
 interface SecureRoutePropsInterface {
   children: React.ReactNode;
 }
 export default function SecureRoute({ children }: SecureRoutePropsInterface) {
+  const [user, loading] = useAuthState(auth);
   const navigate = useNavigate();
-  const auth = useMainStore();
 
   useEffect(() => {
-    if (Cookies.get('authStatus') === 'false') {
-      console.log('you are not logged in');
-      return navigate('/login');
-    }
+    if (!user) navigate('/');
+  }, [user]);
 
-    auth.login();
-  }, []);
-
+  if (loading) return <div>Loading...</div>;
   return (
     <>
-      {auth.userData.loggedIn ? (
+      {user ? (
         <>
           {children}
           {null}

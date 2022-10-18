@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
-
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDhkCBR1AirolAxg4UfnpcOmJmK83O-Jtw',
@@ -13,6 +13,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 async function getCities() {
   const citiesCollection = collection(db, 'cities');
@@ -27,4 +28,36 @@ async function getCitiess() {
   const cityList = citySnapshot.docs.map((doc) => doc.data());
   return cityList;
 }
-export { getCities, getCitiess };
+
+const logInWithEmailAndPassword = async (email: string, password: string) => {
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    return true;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+};
+
+const registerWithEmailAndPassword = async (name: string, email: string, password: string) => {
+  try {
+    const res = await createUserWithEmailAndPassword(auth, email, password);
+    const { user } = res;
+    await addDoc(collection(db, 'users'), {
+      uid: user.uid,
+      name,
+      authProvider: 'local',
+      email,
+      bestScore: 0,
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const logout = () => {
+  signOut(auth);
+  console.log('Logged off');
+};
+
+export { getCities, getCitiess, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, auth };

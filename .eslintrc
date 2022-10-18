@@ -9,6 +9,7 @@
     "@typescript-eslint/no-unused-vars": "warn",
     "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
     "no-console": "off",
+    "react/jsx-props-no-spreading": "off",
     "consistent-return": "off",
     "import/extensions": [
       "error",

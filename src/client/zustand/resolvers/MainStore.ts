@@ -5,7 +5,7 @@ import { MainModel } from '../models/MainModel';
 
 interface MainInterface {
   userData: MainModel;
-  login: () => void;
+  login: (uid: string) => void;
   logout: () => void;
   /*   removeTodo: (id: string) => void;
   toggleCompletedState: (id: string) => void; */
@@ -13,21 +13,19 @@ interface MainInterface {
 
 const useMainStore = create<MainInterface>((set) => ({
   // initial state
-  userData: { loggedIn: false },
+  userData: { loggedIn: false, uid: null },
 
   // methods for manipulating state
-  login: () => {
+  login: (uid: string) => {
     set((state) => ({
-      userData: { ...state.userData, loggedIn: true } as MainModel,
+      userData: { ...state.userData, loggedIn: true, uid } as MainModel,
     }));
-    Cookies.set('authStatus', 'true');
   },
 
   logout: () => {
     set((state) => ({
-      userData: { ...state.userData, loggedIn: false } as MainModel,
+      userData: { ...state.userData, loggedIn: false, uid: null } as MainModel,
     }));
-    Cookies.set('authStatus', 'false');
   },
 }));
 
