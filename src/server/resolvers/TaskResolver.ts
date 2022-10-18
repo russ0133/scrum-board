@@ -1,5 +1,6 @@
-import { collection, query, where, getDocs, addDoc, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import { Task } from '../../client/zustand/models/MainModel';
 import { db } from '../firebase';
 
 // Queries
@@ -22,6 +23,18 @@ async function addTask(ownerId: string, name: string, column: string, status: bo
   }
 }
 
+async function updateTask(taskId: string, parameter: string, value: string) {
+  try {
+    const Collection = collection(db, 'tasks');
+    const Query = query(Collection, where('taskId', '==', taskId));
+    const Snapshot = await getDocs(Query);
+    Snapshot.docs.map((document) => updateDoc(document.ref, { [parameter]: value }));
+    return true;
+  } catch (err) {
+    return err;
+  }
+}
+
 async function removeTask(taskId: string) {
   try {
     const Collection = collection(db, 'tasks');
@@ -34,4 +47,4 @@ async function removeTask(taskId: string) {
   }
 }
 
-export { getAllTasksFromUid, addTask, removeTask };
+export { getAllTasksFromUid, addTask, removeTask, updateTask };

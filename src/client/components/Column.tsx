@@ -1,47 +1,36 @@
 import React, { CSSProperties, FC } from 'react';
-import { useDrop } from 'react-dnd';
+import { v4 as uuidv4 } from 'uuid';
+import { Droppable, Draggable } from '@hello-pangea/dnd';
 import ItemTypes from '../Constants';
-
-const style: CSSProperties = {
-  height: '12rem',
-  width: '12rem',
-  marginRight: '1.5rem',
-  marginBottom: '1.5rem',
-  color: 'white',
-  padding: '1rem',
-  textAlign: 'center',
-  fontSize: '1rem',
-  lineHeight: 'normal',
-  float: 'left',
-};
+import useMainStore from '../zustand/resolvers/MainStore';
+import TaskCard from './TaskCard';
 
 interface ColumnInterface {
   name: string;
 }
 
 function Column({ name }: ColumnInterface) {
-  const [{ canDrop, isOver }, drop] = useDrop(() => ({
-    accept: ItemTypes.CARD,
-    drop: () => ({ name }),
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-    }),
-  }));
+  const taskStore = useMainStore((state) => state.userData.tasks);
 
-  const isActive = canDrop && isOver;
-  let backgroundColor = '#222';
-  if (isActive) {
-    backgroundColor = 'darkgreen';
-  } else if (canDrop) {
-    backgroundColor = 'darkkhaki';
-  }
-
-  return (
-    <div ref={drop} style={{ ...style, backgroundColor }} data-testid="dustbin">
-      <h1>{name}</h1>
-      {isActive ? 'Release to drop' : 'Drag a box here'}
-    </div>
-  );
+  if (taskStore)
+    return (
+      <div>
+        <h2>{name}</h2>
+        <Droppable droppableId={name}>
+          {(provided) => (
+            <div className="flex flex-col items-center text-white  w-full h-52" data-testid="dustbin">
+              <ul className="characters" {...provided.droppableProps} ref={provided.innerRef}>
+                {taskStore.map((task, index) => {
+                  if (task.column === name) return <TaskCard task={task} index={index} />;
+                  return null;
+                })}
+                {provided.placeholder}
+              </ul>
+            </div>
+          )}
+        </Droppable>
+      </div>
+    );
+  return <div>null</div>;
 }
 export default Column;

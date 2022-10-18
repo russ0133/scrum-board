@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
-import TaskCard from './components/TaskCard';
+import React, { useEffect } from 'react';
+
+import { DragDropContext } from '@hello-pangea/dnd';
 import { Task } from './zustand/models/MainModel';
 
 import useMainStore from './zustand/resolvers/MainStore';
@@ -9,7 +9,6 @@ import { logout } from '../server/resolvers/AuthResolver';
 import { getAllTasksFromUid, addTask } from '../server/resolvers/TaskResolver';
 
 export default function Home() {
-  const [loading, setLoading] = useState(true);
   const authStore = useMainStore();
   // hello
   const queryCollections = async () => {
@@ -30,10 +29,13 @@ export default function Home() {
       const tasks = await getAllTasksFromUid(authStore.userData.uid);
       authStore.setTasks(tasks as Task[]);
       console.log(tasks);
-      setLoading(false);
     }
     getAllTasksOnInit();
   }, []);
+
+  const onDragEnd = (result: any) => {
+    console.log(result);
+  };
 
   return (
     <>
@@ -50,28 +52,15 @@ export default function Home() {
         </button>
       </div>
       <h1>App section</h1>
-      <div className="">
-        <div className="grid grid-cols-3 bg-red-500 gap-4">
-          <div className="bg-red-200">
-            <Column name="todos" />
+      <DragDropContext onDragStart={console.log} onDragEnd={onDragEnd}>
+        <div className="">
+          <div className="grid grid-cols-3 bg-red-500 gap-4">
+            <Column name="todo" />
+            <Column name="backlog" />
+            <Column name="hello" />
           </div>
-          <Column name="done" />
-          <Column name="backlog" />
         </div>
-        <div>
-          <h1>Unasigned tasks</h1>
-          {loading ? (
-            <div>Loading tasks...</div>
-          ) : (
-            authStore.userData.tasks?.map((task) => (
-              <div key={uuidv4()} className="px-16 py-2">
-                <TaskCard task={task} />
-              </div>
-            ))
-          )}
-        </div>
-        <div />
-      </div>
+      </DragDropContext>
     </>
   );
 }
