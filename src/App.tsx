@@ -1,19 +1,16 @@
 import React from 'react';
-import { getCities } from './server/firebase';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AuthLifecycle from './client/AuthLifecycle';
+import Login from './client/Login';
 
 function App() {
-  // hello
-  const handleClick = async () => {
-    const cities = await getCities();
-    console.log(cities);
-  };
   return (
-    <div className="bg-red-500">
-      <button type="button" onClick={handleClick}>
-        Hello
-      </button>
-      <div>Hey</div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<AuthLifecycle />} />
+      </Routes>
+    </Router>
   );
 }
 
