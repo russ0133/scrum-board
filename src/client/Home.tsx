@@ -44,12 +44,13 @@ export default function Home() {
   const onDragEnd = (result: any) => {
     const { destination, source, draggableId } = result;
 
+    console.log(destination);
     if (!destination) return console.error('no destination');
     if (!store.userData.tasks) return console.error('no tasks');
     if (destination.droppableId === source.droppableId && destination.index === source.index)
       return console.error('destination and source is the same.');
 
-    store.reorderTask(draggableId, source.index, destination.index);
+    store.reorderTask(draggableId, source.index, destination.index, destination.droppableId);
   };
 
   return (
@@ -67,14 +68,18 @@ export default function Home() {
         </button>
       </div>
       <h1>App section</h1> */}
-
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-3 lg:gap-28 h-screen px-16">
-          <Column name="todo" />
-          <Column name="backlog" />
-          <Column name="hello" />
+      <div className="h-screen flex flex-col justify-between">
+        <div className="w-screen bg-neutral-700 text-4xl py-2 text-gray-100 px-2 flex flex-row justify-between items-center">
+          <span>Scrum</span>
         </div>
-      </DragDropContext>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <div className="grid grid-cols-3 lg:gap-12 h-full md:p-12 p-2 gap-2 ">
+            <Column name="todo" />
+            <Column name="backlog" />
+            <Column name="hello" />
+          </div>
+        </DragDropContext>{' '}
+      </div>
     </>
   );
 }

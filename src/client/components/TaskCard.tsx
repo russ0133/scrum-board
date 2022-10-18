@@ -9,11 +9,11 @@ interface TaskCardProp {
 
 function TaskCard({ task }: TaskCardProp) {
   return (
-    <div className="px-4 rounded-xl">
+    <div className="rounded-xl px-2">
       <Draggable key={task.taskId} draggableId={task.taskId} index={task.order}>
         {(provided) => (
           <div
-            className="w-[100%] mt-2 bg-white rounded-xl shadow p-2"
+            className="w-[100%] bg-neutral-50 rounded-xl shadow-sm p-2 my-2"
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}

@@ -9,10 +9,12 @@ interface MainInterface {
   logout: () => void;
   setTasks: (tasks: Task[]) => void;
   removeTask: (id: string) => void;
+  getTaskQty: (column: string) => number;
   updateTaskName: (id: string, name: string) => void;
   updateTaskColumn: (id: string, name: string) => void;
-  reorderTask: (id: string, sourceIndex: number, destinationIndex: number) => void;
+  reorderTask: (id: string, sourceIndex: number, destinationIndex: number, destinationColumn: string) => void;
   updateTaskByParam: (id: string, param: string, data: any) => void;
+
   /*   removeTodo: (id: string) => void;
   toggleCompletedState: (id: string) => void; */
 }
@@ -27,6 +29,16 @@ const useMainStore = create<MainInterface>((set, get) => ({
     set((state) => ({
       userData: { ...state.userData, tasks } as MainModel,
     }));
+  },
+
+  getTaskQty: (column: string) => {
+    const { tasks } = get().userData;
+    if (tasks) {
+      const a = tasks.filter((task) => task.column === column).length;
+      if (a > 0) return a;
+      return 0;
+    }
+    return 0;
   },
 
   updateTaskByParam: (id: string, param: string, data: any) => {
@@ -50,7 +62,7 @@ const useMainStore = create<MainInterface>((set, get) => ({
     console.log(tasks);
   },
 
-  reorderTask: async (id: string, sourceIndex: number, destinationIndex: number) => {
+  reorderTask: (id: string, sourceIndex: number, destinationIndex: number, destinationColumn: string) => {
     const { tasks } = get().userData;
     if (!tasks) return console.error('No task found with this ID.');
 
@@ -58,6 +70,7 @@ const useMainStore = create<MainInterface>((set, get) => ({
     const reorderedTasks = tasks;
     if (reorderedTask) {
       reorderedTask.order = destinationIndex;
+      reorderedTask.column = destinationColumn;
 
       reorderedTasks.splice(sourceIndex, 1);
       reorderedTasks.splice(destinationIndex, 0, reorderedTask);
