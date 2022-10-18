@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, addDoc, where, query } from 'firebase/firestore';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 const firebaseConfig = {
@@ -15,20 +15,27 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-async function getCities() {
-  const citiesCollection = collection(db, 'cities');
-  const citySnapshot = await getDocs(citiesCollection);
-  const cityList = citySnapshot.docs.map((doc) => doc.data());
-  return cityList;
+// Queries
+async function getAllTasksFromUid(uid: string) {
+  const Collection = collection(db, 'tasks');
+  const Query = query(Collection, where('uid', '==', uid));
+  const Snapshot = await getDocs(Query);
+  const Data = Snapshot.docs.map((doc) => doc.data());
+  return Data;
 }
 
-async function getCitiess() {
-  const citiesCollection = collection(db, 'cities');
-  const citySnapshot = await getDocs(citiesCollection);
-  const cityList = citySnapshot.docs.map((doc) => doc.data());
-  return cityList;
+// Mutations
+async function addTask(uid: string, name: string, column: string, status: boolean) {
+  try {
+    const Collection = collection(db, 'tasks');
+    const Mutation = await addDoc(Collection, { uid, name, column, status });
+    return Mutation;
+  } catch (err) {
+    return err;
+  }
 }
 
+//  Authentication
 const logInWithEmailAndPassword = async (email: string, password: string) => {
   try {
     await signInWithEmailAndPassword(auth, email, password);
@@ -60,4 +67,4 @@ const logout = () => {
   console.log('Logged off');
 };
 
-export { getCities, getCitiess, logInWithEmailAndPassword, registerWithEmailAndPassword, logout, auth };
+export { logInWithEmailAndPassword, registerWithEmailAndPassword, logout, auth, getAllTasksFromUid, addTask };
