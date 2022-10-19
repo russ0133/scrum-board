@@ -6,6 +6,7 @@ import useMainStore from './zustand/resolvers/MainStore';
 import { getUser, updateUserColumns } from '../server/resolvers/TaskResolver';
 import { logout } from '../server/resolvers/AuthResolver';
 import { DEFAULT_COLUMNS } from '../server/Constants';
+import Column from './components/Column';
 
 export default function Home() {
   const store = useMainStore();
@@ -103,38 +104,7 @@ export default function Home() {
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-3 lg:gap-12 h-full md:p-12 p-2 gap-2 ">
           {Object.entries(store.userData.columns).map(([columnId, column]) => (
-            <div key={columnId}>
-              <div>{column.title}</div>
-              <Droppable droppableId={columnId} key={columnId}>
-                {(provided) => (
-                  <ul {...provided.droppableProps} ref={provided.innerRef}>
-                    {column.items.map((item, index) => (
-                      <Draggable key={item.id} draggableId={item.id} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={{
-                              userSelect: 'none',
-                              padding: 16,
-                              margin: '0 0 8px 0',
-                              minHeight: '50px',
-                              backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
-                              color: 'white',
-                              ...provided.draggableProps.style,
-                            }}
-                          >
-                            {item.content}
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </ul>
-                )}
-              </Droppable>
-            </div>
+            <Column columnId={columnId} column={column} />
           ))}
         </div>
       </DragDropContext>{' '}

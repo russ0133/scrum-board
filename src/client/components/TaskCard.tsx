@@ -1,29 +1,35 @@
 import React from 'react';
 
 import { Draggable } from '@hello-pangea/dnd';
-import { Task, Task } from '../zustand/models/MainModel';
+import { Task } from '../zustand/models/MainModel';
 
 interface TaskCardProp {
-  task: Task;
+  item: Task;
   index: number;
 }
 
-function TaskCard({ task, index }: TaskCardProp) {
+function TaskCard({ item, index }: TaskCardProp) {
   return (
-    <div className="rounded-xl px-2">
-      <Draggable key={task.id} draggableId={task.id} index={index}>
-        {(provided) => (
-          <div
-            className="w-[100%] bg-neutral-50 rounded-xl shadow-sm p-2 my-2"
-            ref={provided.innerRef}
-            {...provided.draggableProps}
-            {...provided.dragHandleProps}
-          >
-            {task.content}: {index}
-          </div>
-        )}
-      </Draggable>
-    </div>
+    <Draggable key={item.id} draggableId={item.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          style={{
+            userSelect: 'none',
+            padding: 16,
+            margin: '0 0 8px 0',
+            minHeight: '50px',
+            backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
+            color: 'white',
+            ...provided.draggableProps.style,
+          }}
+        >
+          {item.content}
+        </div>
+      )}
+    </Draggable>
   );
 }
 

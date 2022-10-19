@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Droppable } from '@hello-pangea/dnd';
+import { Draggable, Droppable } from '@hello-pangea/dnd';
 import { Divider } from '@mantine/core';
 import { IconChecklist } from '@tabler/icons';
 import useMainStore from '../zustand/resolvers/MainStore';
@@ -7,19 +7,25 @@ import TaskCard from './TaskCard';
 import { ColumnInterface, Task } from '../zustand/models/MainModel';
 
 interface ColumnProps {
-  name: string;
-  data: ColumnInterface;
+  columnId: string;
+  column: ColumnInterface;
 }
 
-function Column({ name, data }: ColumnProps) {
-  const taskStore = useMainStore((state) => state.userData.tasks);
-  const tasks = useMainStore((state) => state.userData.newTasks);
-  const defaultQty = taskStore ? taskStore.filter((task) => task.column === name).length : 0;
-  const [items, setItems] = useState(defaultQty);
-
-  const [taskList, setTaskList] = useState<Task[]>();
-
-  if (tasks) return null;
-  return <div>null</div>;
+function Column({ columnId, column }: ColumnProps) {
+  return (
+    <div key={columnId}>
+      <div>{column.title}</div>
+      <Droppable droppableId={columnId} key={columnId}>
+        {(provided) => (
+          <ul {...provided.droppableProps} ref={provided.innerRef}>
+            {column.items.map((item, index) => (
+              <TaskCard item={item} index={index} />
+            ))}
+            {provided.placeholder}
+          </ul>
+        )}
+      </Droppable>
+    </div>
+  );
 }
 export default Column;
