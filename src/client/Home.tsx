@@ -4,9 +4,9 @@ import { DragDropContext, OnDragEndResponder } from '@hello-pangea/dnd';
 import { Task } from './zustand/models/MainModel';
 
 import useMainStore from './zustand/resolvers/MainStore';
-import Column from './components/Column';
 import { logout } from '../server/resolvers/AuthResolver';
 import { getAllTasksFromUid, addTask } from '../server/resolvers/TaskResolver';
+import Column from './components/Column';
 
 export default function Home() {
   const store = useMainStore();
@@ -44,13 +44,13 @@ export default function Home() {
   const onDragEnd = (result: any) => {
     const { destination, source, draggableId } = result;
 
-    console.log(destination);
     if (!destination) return console.error('no destination');
     if (!store.userData.tasks) return console.error('no tasks');
     if (destination.droppableId === source.droppableId && destination.index === source.index)
       return console.error('destination and source is the same.');
 
-    store.reorderTask(draggableId, source.index, destination.index, destination.droppableId);
+    store.setColumn(source.droppableId, draggableId, source.index, destination.index);
+    /* store.reorderTask(draggableId, source.index, destination.index, destination.droppableId); */
   };
 
   return (
@@ -74,9 +74,11 @@ export default function Home() {
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="grid grid-cols-3 lg:gap-12 h-full md:p-12 p-2 gap-2 ">
-            <Column name="todo" />
+            {store.userData.columns &&
+              store.userData.columns.map((column) => <Column key={column.id} name={column.title} data={column} />)}
+            {/*             <Column name="todo" />
             <Column name="backlog" />
-            <Column name="hello" />
+            <Column name="hello" /> */}
           </div>
         </DragDropContext>{' '}
       </div>
