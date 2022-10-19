@@ -5,14 +5,14 @@ import { ColumnObject, MainModel } from '../models/MainModel';
 
 interface MainInterface {
   userData: MainModel;
+
   login: (uid: string) => void;
   logout: () => void;
+
   setColumn: (column: ColumnObject) => void;
+
   deleteTask: (columnId: string, cardIndex: number) => void;
   addTask: (columnId: string, content: string) => void;
-
-  /*   removeTodo: (id: string) => void;
-  toggleCompletedState: (id: string) => void; */
 }
 
 const useMainStore = create<MainInterface>((set, get) => ({
