@@ -33,7 +33,7 @@ function Column({ columnId, column }: ColumnProps) {
           </div>
           <div
             onClick={addTask}
-            className="bg-green-600/70 hover:bg-green-600 p-[2px] transition-colors hover:cursor-pointer rounded-full"
+            className="bg-green-600/70 hover:bg-green-600 p-[1px] transition-colors hover:cursor-pointer rounded-sm"
           >
             <IconPlus size={20} />
           </div>

@@ -2,11 +2,13 @@ import React, { useEffect } from 'react';
 
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
+import { AppShell, Navbar, Header, Title, Grid, SimpleGrid, Container, Paper, Text } from '@mantine/core';
 import useMainStore from './zustand/resolvers/MainStore';
 import { getUser, updateUserColumns } from '../server/resolvers/TaskResolver';
 import { logout } from '../server/resolvers/AuthResolver';
 import { DEFAULT_COLUMNS } from '../server/Constants';
 import Column from './components/Column';
+import ColumnMantine from './components/ColumnMantine';
 
 export default function Home() {
   const store = useMainStore();
@@ -94,7 +96,27 @@ export default function Home() {
   }, [store.userData]);
 
   return (
-    <div className="h-screen flex flex-col justify-between">
+    <AppShell
+      header={
+        <Header height={60} p="xs">
+          <Title color="gray">Scrum</Title>
+        </Header>
+      }
+      styles={(theme) => ({
+        main: { backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0] },
+      })}
+    >
+      <Container>
+        <SimpleGrid cols={3}>
+          <DragDropContext onDragEnd={onDragEnd}>
+            {Object.entries(store.userData.columns).map(([columnId, column]) => (
+              <ColumnMantine columnId={columnId} column={column} key={columnId} />
+            ))}
+          </DragDropContext>{' '}
+        </SimpleGrid>
+      </Container>
+    </AppShell>
+    /*     <div className="h-screen flex flex-col justify-between">
       <div className="w-screen bg-neutral-700 text-4xl py-2 text-gray-100 px-2 flex flex-row justify-between items-center">
         <span>Scrum</span>
         <button type="button" onClick={logout}>
@@ -108,6 +130,6 @@ export default function Home() {
           ))}
         </div>
       </DragDropContext>{' '}
-    </div>
+    </div> */
   );
 }

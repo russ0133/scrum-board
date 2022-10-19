@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 import { Draggable } from '@hello-pangea/dnd';
-import { IconAdjustments, IconEraser, IconTrash } from '@tabler/icons';
-import { ActionIcon, Group, Spoiler, Text } from '@mantine/core';
+import { IconEraser, IconTrash } from '@tabler/icons';
+import { Paper, Text } from '@mantine/core';
 import { Task } from '../zustand/models/MainModel';
 import useMainStore from '../zustand/resolvers/MainStore';
 
@@ -12,7 +12,7 @@ interface TaskCardProp {
   columnId: string;
 }
 
-function TaskCard({ item, index, columnId }: TaskCardProp) {
+function TaskCardMantine({ item, index, columnId }: TaskCardProp) {
   const store = useMainStore();
   const [buttonsVisible, setButtonsVisible] = useState(false);
   function deleteCard() {
@@ -21,30 +21,24 @@ function TaskCard({ item, index, columnId }: TaskCardProp) {
   return (
     <Draggable key={item.id} draggableId={item.id} index={index}>
       {(provided, snapshot) => {
-        const draggingStyle = snapshot.isDragging ? 'bg-slate-300' : 'bg-slate-200';
+        const draggingStyle = snapshot.isDragging ? 'border-2 border-gray-500' : '';
         const visible = buttonsVisible ? 'visible' : 'invisible';
         return (
-          <Group
+          <div
             onMouseEnter={() => setButtonsVisible(true)}
             onMouseLeave={() => setButtonsVisible(false)}
-            className={`rounded-xl px-2 shadow-sm py-2 -mb-4 mt-6 items-center  flex flex-row justify-between break-normal  ${draggingStyle}`}
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
           >
-            <Spoiler maxHeight={50} showLabel="expand" hideLabel="hide">
-              <Text className="break-all">{item.content}</Text>
-            </Spoiler>
-            {buttonsVisible && (
-              <ActionIcon radius="xl" variant="filled" size="sm" onClick={() => deleteCard()}>
-                <IconTrash size={18} />
-              </ActionIcon>
-            )}
-          </Group>
+            <Paper shadow="xs" p="xs" radius="lg">
+              <Text>{item.content}</Text>
+            </Paper>
+          </div>
         );
       }}
     </Draggable>
   );
 }
 
-export default TaskCard;
+export default TaskCardMantine;
