@@ -2,7 +2,20 @@ import React, { useEffect } from 'react';
 
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
-import { AppShell, Navbar, Header, Title, Grid, SimpleGrid, Container, Paper, Text } from '@mantine/core';
+import {
+  AppShell,
+  Navbar,
+  Header,
+  Title,
+  Grid,
+  SimpleGrid,
+  Container,
+  Paper,
+  Text,
+  Group,
+  Center,
+  Button,
+} from '@mantine/core';
 import useMainStore from './zustand/resolvers/MainStore';
 import { getUser, updateUserColumns } from '../server/resolvers/TaskResolver';
 import { logout } from '../server/resolvers/AuthResolver';
@@ -99,7 +112,12 @@ export default function Home() {
     <AppShell
       header={
         <Header height={60} p="xs">
-          <Title color="gray">Scrum</Title>
+          <Group position="apart">
+            <Title color="gray">Scrum</Title>
+            <Button color="red" radius="lg" compact>
+              Logout
+            </Button>
+          </Group>
         </Header>
       }
       styles={(theme) => ({
