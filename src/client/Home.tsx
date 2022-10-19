@@ -104,7 +104,7 @@ export default function Home() {
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="grid grid-cols-3 lg:gap-12 h-full md:p-12 p-2 gap-2 ">
           {Object.entries(store.userData.columns).map(([columnId, column]) => (
-            <Column columnId={columnId} column={column} />
+            <Column columnId={columnId} column={column} key={columnId} />
           ))}
         </div>
       </DragDropContext>{' '}

@@ -10,6 +10,8 @@
     "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
     "no-console": "off",
     "react/jsx-props-no-spreading": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
     "@typescript-eslint/no-shadow": "off",
     "no-param-reassign": "off",
     "no-restricted-syntax": "off",
