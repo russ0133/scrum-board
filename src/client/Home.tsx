@@ -1,87 +1,142 @@
 import React, { useEffect } from 'react';
 
-import { DragDropContext, OnDragEndResponder } from '@hello-pangea/dnd';
-import { Task } from './zustand/models/MainModel';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
 import useMainStore from './zustand/resolvers/MainStore';
+import { getUser, updateColumns } from '../server/resolvers/TaskResolver';
 import { logout } from '../server/resolvers/AuthResolver';
-import { getAllTasksFromUid, addTask } from '../server/resolvers/TaskResolver';
-import Column from './components/Column';
+import { DEFAULT_COLUMNS } from '../server/Constants';
 
 export default function Home() {
   const store = useMainStore();
-
-  const queryCollections = async () => {
-    if (!store.userData.uid) return;
-    const cities = await getAllTasksFromUid(store.userData.uid);
-  };
-
-  const addDocument = async () => {
-    if (!store.userData.uid) return;
-    const cities = await addTask(store.userData.uid, 'Test', 'todo', false);
-  };
-
   useEffect(() => {
-    /** - Orders the array based on the order property. */
-    function order(a: Task, b: Task) {
-      if (a.order < b.order) return -1;
-      if (a.order > b.order) return 1;
-      return 0;
-    }
-
     /** - Fetches all Tasks from Firebase. */
     async function getAllTasksOnInit() {
-      if (!store.userData.uid) return;
-      const tasks = await getAllTasksFromUid(store.userData.uid);
-      tasks.sort((a: Task, b: Task) => order(a, b));
+      if (store.userData.uid) {
+        const data = await getUser(store.userData.uid);
+        let userColumns = data[0].columns;
 
-      store.setTasks(tasks as Task[]);
+        if (Object.keys(userColumns).length === 0) {
+          //  => If the fetched data is empty, set default.
+          userColumns = DEFAULT_COLUMNS;
+        }
+
+        //  => Transforms the Object into an array so it can be sorted.
+        const sortable = [];
+        for (const col in userColumns) {
+          sortable.push([col, userColumns[col]]);
+        }
+        sortable.sort();
+        console.log('sortable:', sortable);
+
+        const obj = Object.fromEntries(
+          sortable.map((year: any) => [
+            year[0],
+            {
+              ...year[1],
+            },
+          ])
+        );
+
+        // ---
+
+        store.setColumn(obj);
+      }
     }
 
     getAllTasksOnInit();
   }, []);
 
   const onDragEnd = (result: any) => {
-    const { destination, source, draggableId } = result;
+    if (!result.destination) return;
+    const { source, destination } = result;
+    const { columns } = store.userData;
 
-    if (!destination) return console.error('no destination');
-    if (!store.userData.tasks) return console.error('no tasks');
-    if (destination.droppableId === source.droppableId && destination.index === source.index)
-      return console.error('destination and source is the same.');
-
-    store.setColumn(source.droppableId, draggableId, source.index, destination.index);
-    /* store.reorderTask(draggableId, source.index, destination.index, destination.droppableId); */
+    if (source.droppableId !== destination.droppableId) {
+      const sourceColumn = columns[source.droppableId];
+      const destColumn = columns[destination.droppableId];
+      const sourceItems = [...sourceColumn.items];
+      const destItems = [...destColumn.items];
+      const [removed] = sourceItems.splice(source.index, 1);
+      destItems.splice(destination.index, 0, removed);
+      store.setColumn({
+        ...columns,
+        [source.droppableId]: {
+          ...sourceColumn,
+          items: sourceItems,
+        },
+        [destination.droppableId]: {
+          ...destColumn,
+          items: destItems,
+        },
+      });
+    } else {
+      const column = columns[source.droppableId];
+      const copiedItems = [...column.items];
+      const [removed] = copiedItems.splice(source.index, 1);
+      copiedItems.splice(destination.index, 0, removed);
+      store.setColumn({
+        ...columns,
+        [source.droppableId]: {
+          ...column,
+          items: copiedItems,
+        },
+      });
+    }
   };
 
+  useEffect(() => {
+    if (store.userData.columns && store.userData.uid) {
+      updateColumns(store.userData.columns, store.userData.uid);
+    }
+  }, [store.userData]);
+
   return (
-    <>
-      {/*       <div className=" flex flex-col items-center gap-2">
-        <h1>Debug section</h1>
-        <button type="button" className="bg-blue-500 text-white" onClick={queryCollections}>
-          Click here to show collection!
-        </button>
-        <button type="button" className="bg-green-500 text-white" onClick={addDocument}>
-          Click here to add collection!
-        </button>
-        <button type="button" className="bg-red-500 text-white" onClick={logout}>
-          Click here to log off!
+    <div className="h-screen flex flex-col justify-between">
+      <div className="w-screen bg-neutral-700 text-4xl py-2 text-gray-100 px-2 flex flex-row justify-between items-center">
+        <span>Scrum</span>
+        <button type="button" onClick={logout}>
+          logout
         </button>
       </div>
-      <h1>App section</h1> */}
-      <div className="h-screen flex flex-col justify-between">
-        <div className="w-screen bg-neutral-700 text-4xl py-2 text-gray-100 px-2 flex flex-row justify-between items-center">
-          <span>Scrum</span>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="grid grid-cols-3 lg:gap-12 h-full md:p-12 p-2 gap-2 ">
+          {Object.entries(store.userData.columns).map(([columnId, column]) => (
+            <div key={columnId}>
+              <div>{column.title}</div>
+              <Droppable droppableId={columnId} key={columnId}>
+                {(provided) => (
+                  <ul {...provided.droppableProps} ref={provided.innerRef}>
+                    {column.items.map((item, index) => (
+                      <Draggable key={item.id} draggableId={item.id} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            style={{
+                              userSelect: 'none',
+                              padding: 16,
+                              margin: '0 0 8px 0',
+                              minHeight: '50px',
+                              backgroundColor: snapshot.isDragging ? '#263B4A' : '#456C86',
+                              color: 'white',
+                              ...provided.draggableProps.style,
+                            }}
+                          >
+                            {item.content}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </ul>
+                )}
+              </Droppable>
+            </div>
+          ))}
         </div>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div className="grid grid-cols-3 lg:gap-12 h-full md:p-12 p-2 gap-2 ">
-            {store.userData.columns &&
-              store.userData.columns.map((column) => <Column key={column.id} name={column.title} data={column} />)}
-            {/*             <Column name="todo" />
-            <Column name="backlog" />
-            <Column name="hello" /> */}
-          </div>
-        </DragDropContext>{' '}
-      </div>
-    </>
+      </DragDropContext>{' '}
+    </div>
   );
 }

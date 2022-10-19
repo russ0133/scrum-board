@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { Draggable } from '@hello-pangea/dnd';
-import { NewTask, Task } from '../zustand/models/MainModel';
+import { Task, Task } from '../zustand/models/MainModel';
 
 interface TaskCardProp {
-  task: NewTask;
+  task: Task;
   index: number;
 }
 

@@ -1,6 +1,7 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { addDoc, collection } from 'firebase/firestore';
 import { auth, db } from '../firebase';
+import { DEFAULT_COLUMNS } from '../Constants';
 
 const logInWithEmailAndPassword = async (email: string, password: string) => {
   try {
@@ -21,7 +22,7 @@ const registerWithEmailAndPassword = async (name: string, email: string, passwor
       name,
       authProvider: 'local',
       email,
-      bestScore: 0,
+      columns: DEFAULT_COLUMNS,
     });
   } catch (err) {
     console.error(err);
