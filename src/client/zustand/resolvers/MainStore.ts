@@ -1,6 +1,6 @@
 import create from 'zustand';
 
-import { MainModel, Task } from '../models/MainModel';
+import { ColumnInterface, MainModel, Task } from '../models/MainModel';
 import { removeTask, updateAllTasksIndexes, updateTask } from '../../../server/resolvers/TaskResolver';
 
 interface MainInterface {
@@ -8,12 +8,10 @@ interface MainInterface {
   login: (uid: string) => void;
   logout: () => void;
   setTasks: (tasks: Task[]) => void;
+  setColumn: (droppableId: string, draggableId: string, sourceIndex: number, destinationIndex: number) => void;
   removeTask: (id: string) => void;
   getTaskQty: (column: string) => number;
-  updateTaskName: (id: string, name: string) => void;
-  updateTaskColumn: (id: string, name: string) => void;
   reorderTask: (id: string, sourceIndex: number, destinationIndex: number, destinationColumn: string) => void;
-  updateTaskByParam: (id: string, param: string, data: any) => void;
 
   /*   removeTodo: (id: string) => void;
   toggleCompletedState: (id: string) => void; */
@@ -21,9 +19,61 @@ interface MainInterface {
 
 const useMainStore = create<MainInterface>((set, get) => ({
   // initial state
-  userData: { loggedIn: false, uid: null, tasks: null },
+  userData: {
+    loggedIn: false,
+    uid: null,
+    tasks: null,
+    newTasks: [
+      { id: 'task-1', content: 'wash dishes' },
+      { id: 'task-2', content: 'do-something' },
+      { id: 'task-3', content: 'do-something-else' },
+    ],
+    columns: [
+      {
+        id: 'column-1',
+        title: 'to-do',
+        taskIds: ['task-1', 'task-2', 'task-3'],
+      },
+      {
+        id: 'column-2',
+        title: 'to-do',
+        taskIds: [],
+      },
+    ],
+  },
 
   // methods for manipulating state
+  setColumn: (droppableId: string, draggableId: string, sourceIndex: number, destinationIndex: number) => {
+    /*     const { tasks } = get().userData;
+    if (!tasks) return console.error('No task found with this ID.');
+
+    const reorderedTask = tasks.find((store) => store.taskId === id);
+    const reorderedTasks = tasks;
+    if (reorderedTask) {
+      reorderedTask.order = destinationIndex;
+      reorderedTask.column = destinationColumn;
+
+      reorderedTasks.splice(sourceIndex, 1);
+      reorderedTasks.splice(destinationIndex, 0, reorderedTask);
+      reorderedTasks.forEach((task, index) => {
+        task.order = index;
+      });
+
+      set((state) => ({
+        userData: { ...state.userData, tasks: reorderedTasks } as MainModel,
+      }));
+
+      setTimeout(() => {
+        updateAllTasksIndexes(reorderedTasks);
+        console.log('Updated store.');
+      }, 1000);
+    } */
+    const { columns } = get().userData;
+    if (!columns) return console.error('a');
+    const reorderedColumn = tasks.
+  },
+
+  ///
 
   setTasks: (tasks: Task[]) => {
     set((state) => ({
@@ -39,27 +89,6 @@ const useMainStore = create<MainInterface>((set, get) => ({
       return 0;
     }
     return 0;
-  },
-
-  updateTaskByParam: (id: string, param: string, data: any) => {
-    const { tasks } = get().userData;
-    if (!tasks) return console.error('No task found with this ID.');
-
-    const newTasks = tasks.map((t) => {
-      if (t.taskId === id) {
-        const mutatedTask = t;
-        // @ts-ignore
-        mutatedTask[param] = data;
-        return mutatedTask;
-      }
-      return t;
-    });
-
-    set((state) => ({
-      userData: { ...state.userData, newTasks } as MainModel,
-    }));
-
-    console.log(tasks);
   },
 
   reorderTask: (id: string, sourceIndex: number, destinationIndex: number, destinationColumn: string) => {
@@ -87,48 +116,6 @@ const useMainStore = create<MainInterface>((set, get) => ({
         console.log('Updated store.');
       }, 1000);
     }
-  },
-
-  updateTaskName: (id: string, newName: string) => {
-    const { tasks } = get().userData;
-    if (!tasks) return console.error('No task found with this ID.');
-
-    const newTasks = tasks.map((t) => {
-      if (t.taskId === id) {
-        const mutatedTask = t;
-        mutatedTask.name = newName;
-        return mutatedTask;
-      }
-      return t;
-    });
-
-    set((state) => ({
-      userData: { ...state.userData, newTasks } as MainModel,
-    }));
-
-    updateTask(id, 'name', newName);
-    console.log(tasks);
-  },
-
-  updateTaskColumn: (id: string, newColumn: string) => {
-    const { tasks } = get().userData;
-    if (!tasks) return console.error('No task found with this ID.');
-
-    const newTasks = tasks.map((t) => {
-      if (t.taskId === id) {
-        const mutatedTask = t;
-        mutatedTask.column = newColumn;
-        return mutatedTask;
-      }
-      return t;
-    });
-
-    set((state) => ({
-      userData: { ...state.userData, newTasks } as MainModel,
-    }));
-
-    updateTask(id, 'column', newColumn);
-    console.log(tasks);
   },
 
   removeTask: (id: string) => {
