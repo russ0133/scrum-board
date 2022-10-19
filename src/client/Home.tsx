@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 
 import useMainStore from './zustand/resolvers/MainStore';
-import { getUser, updateColumns } from '../server/resolvers/TaskResolver';
+import { getUser, updateUserColumns } from '../server/resolvers/TaskResolver';
 import { logout } from '../server/resolvers/AuthResolver';
 import { DEFAULT_COLUMNS } from '../server/Constants';
 
@@ -45,6 +45,7 @@ export default function Home() {
     }
 
     getAllTasksOnInit();
+    console.log('Init');
   }, []);
 
   const onDragEnd = (result: any) => {
@@ -87,7 +88,7 @@ export default function Home() {
 
   useEffect(() => {
     if (store.userData.columns && store.userData.uid) {
-      updateColumns(store.userData.columns, store.userData.uid);
+      updateUserColumns(store.userData.uid, store.userData.columns);
     }
   }, [store.userData]);
 

@@ -13,6 +13,11 @@ const DEFAULT_COLUMNS = {
     items: [],
     order: 1,
   },
+  'column-3': {
+    title: 'done',
+    items: [],
+    order: 1,
+  },
 };
 
 const a = 1;

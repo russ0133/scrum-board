@@ -1,7 +1,6 @@
 import create from 'zustand';
 
 import { ColumnObject, MainModel } from '../models/MainModel';
-import { updateColumns } from '../../../server/resolvers/TaskResolver';
 
 interface MainInterface {
   userData: MainModel;
@@ -13,7 +12,7 @@ interface MainInterface {
   toggleCompletedState: (id: string) => void; */
 }
 
-const useMainStore = create<MainInterface>((set, get) => ({
+const useMainStore = create<MainInterface>((set) => ({
   // initial state
   userData: {
     loggedIn: false,
@@ -23,12 +22,9 @@ const useMainStore = create<MainInterface>((set, get) => ({
 
   // methods for manipulating state
   setColumn: (column: ColumnObject) => {
-    const { uid, columns } = get().userData;
     set((state) => ({
       userData: { ...state.userData, columns: column } as MainModel,
     }));
-    console.log(get().userData);
-    if (uid) updateColumns(columns, uid);
   },
 
   login: (uid: string) => {

@@ -12,8 +12,7 @@ async function getUser(ownerId: string) {
 }
 
 // Mutations
-
-async function updateColumns(column: ColumnObject, uid: string) {
+async function updateUserColumns(uid: string, column: ColumnObject) {
   try {
     const Collection = collection(db, 'users');
     const Query = query(Collection, where('uid', '==', uid));
@@ -25,4 +24,4 @@ async function updateColumns(column: ColumnObject, uid: string) {
   }
 }
 
-export { getUser, updateColumns };
+export { getUser, updateUserColumns };
