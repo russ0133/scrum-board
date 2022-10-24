@@ -1,27 +1,15 @@
 import React, { useEffect } from 'react';
 
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { DragDropContext } from '@hello-pangea/dnd';
 
-import {
-  AppShell,
-  Navbar,
-  Header,
-  Title,
-  Grid,
-  SimpleGrid,
-  Container,
-  Paper,
-  Text,
-  Group,
-  Center,
-  Button,
-} from '@mantine/core';
+import { AppShell, Header, Title, SimpleGrid, Container, Group, Button } from '@mantine/core';
 import useMainStore from './zustand/resolvers/MainStore';
 import { getUser, updateUserColumns } from '../server/resolvers/TaskResolver';
 import { logout } from '../server/resolvers/AuthResolver';
 import { DEFAULT_COLUMNS } from '../server/Constants';
 import Column from './components/Column';
 import ColumnMantine from './components/ColumnMantine';
+import { ColumnInterface } from './zustand/models/MainModel';
 
 export default function Home() {
   const store = useMainStore();
@@ -114,7 +102,7 @@ export default function Home() {
         <Header height={60} p="xs">
           <Group position="apart">
             <Title color="gray">Scrum</Title>
-            <Button color="red" radius="lg" compact>
+            <Button color="red" radius="lg" compact onClick={() => store.logout()}>
               Logout
             </Button>
           </Group>
@@ -128,7 +116,7 @@ export default function Home() {
         <SimpleGrid cols={3}>
           <DragDropContext onDragEnd={onDragEnd}>
             {Object.entries(store.userData.columns).map(([columnId, column]) => (
-              <ColumnMantine columnId={columnId} column={column} key={columnId} />
+              <ColumnMantine columnId={columnId} column={column as ColumnInterface} key={columnId} />
             ))}
           </DragDropContext>{' '}
         </SimpleGrid>

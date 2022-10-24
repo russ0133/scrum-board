@@ -1,10 +1,12 @@
 import { v4 as uuidv4 } from 'uuid';
+import produce from 'immer';
 import create from 'zustand';
 
 import { ColumnObject, MainModel } from '../models/MainModel';
+import { logout } from '../../../server/resolvers/AuthResolver';
 
 interface MainInterface {
-  userData: MainModel;
+  userData: any;
 
   login: (uid: string) => void;
   logout: () => void;
@@ -13,6 +15,8 @@ interface MainInterface {
 
   deleteTask: (columnId: string, cardIndex: number) => void;
   addTask: (columnId: string, content: string) => void;
+
+  immerInc: (index: number, property: string, value: any) => void;
 }
 
 const useMainStore = create<MainInterface>((set, get) => ({
@@ -21,6 +25,8 @@ const useMainStore = create<MainInterface>((set, get) => ({
     loggedIn: false,
     uid: null,
     columns: {},
+    count: 0,
+    a: [{ b: 3 }, { b: 4 }],
   },
 
   // methods for manipulating state
@@ -42,6 +48,15 @@ const useMainStore = create<MainInterface>((set, get) => ({
     }));
   },
 
+  immerInc: (index, property, value) => {
+    set(
+      produce((state: MainInterface) => {
+        state.userData.a[index][property] += value;
+        console.log(state.userData.count);
+      })
+    );
+  },
+
   deleteTask: (columnId: string, cardIndex: number) => {
     let { columns } = get().userData;
     const column = columns[columnId];
@@ -59,6 +74,8 @@ const useMainStore = create<MainInterface>((set, get) => ({
   },
 
   logout: () => {
+    const b = logout();
+    window.alert(b);
     set((state) => ({
       userData: { ...state.userData, loggedIn: false, uid: null } as MainModel,
     }));

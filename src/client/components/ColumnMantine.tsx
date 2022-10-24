@@ -1,28 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Draggable, Droppable } from '@hello-pangea/dnd';
+import React, { useState } from 'react';
+import { Droppable } from '@hello-pangea/dnd';
 import { useClickOutside } from '@mantine/hooks';
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  Card,
-  CardSection,
-  Center,
-  Container,
-  Divider,
-  Group,
-  Image,
-  Input,
-  Modal,
-  Paper,
-  Stack,
-  Text,
-  TextInput,
-} from '@mantine/core';
-import { IconCheck, IconChecklist, IconCirclePlus, IconPlus, IconTrash } from '@tabler/icons';
+import { ActionIcon, Badge, Card, Center, Group, Text, TextInput } from '@mantine/core';
+import { IconCheck, IconChecklist, IconPlus } from '@tabler/icons';
 import useMainStore from '../zustand/resolvers/MainStore';
 import TaskCard from './TaskCard';
-import { ColumnInterface, Task } from '../zustand/models/MainModel';
+import { ColumnInterface } from '../zustand/models/MainModel';
 
 interface ColumnProps {
   columnId: string;
@@ -34,9 +17,11 @@ function ColumnMantine({ columnId, column }: ColumnProps) {
   const ref = useClickOutside(() => setOpened(false));
 
   const store = useMainStore();
+
   function addTask() {
     store.addTask(columnId, 'Hello');
   }
+
   return (
     <div>
       <Card shadow="sm" p="sm" radius="md">

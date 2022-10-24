@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TextInput, PasswordInput, Button, Group, Box } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { useNavigate } from 'react-router';
 import { registerWithEmailAndPassword } from '../server/resolvers/AuthResolver';
+import useMainStore from './zustand/resolvers/MainStore';
+import { auth } from '../server/firebase';
 
 function Register() {
+  const authStore = useMainStore();
+  const [user, loading] = useAuthState(auth);
+  const navigate = useNavigate();
+
   const form = useForm({
     initialValues: {
       name: '',
@@ -15,6 +23,13 @@ function Register() {
       email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Invalid email'),
     },
   });
+
+  useEffect(() => {
+    if (user) {
+      navigate('/app');
+      authStore.login(user.uid);
+    }
+  }, [user, loading]);
 
   const onSubmit = (values: any) => {
     registerWithEmailAndPassword(values.name, values.email, values.password);

@@ -2,6 +2,7 @@ export interface MainModel {
   loggedIn: boolean;
   uid: string | null;
   columns: ColumnObject;
+  count: number;
 }
 
 export interface ColumnObject {

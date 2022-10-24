@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { TextInput, PasswordInput, Button, Group, Box } from '@mantine/core';
+import { TextInput, PasswordInput, Button, Group, Box, Text, Paper } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useNavigate } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -35,10 +35,9 @@ function Login() {
   const onSubmit = async (values: any) => {
     const login = await logInWithEmailAndPassword(values.email, values.password);
     if (login === true) {
-      console.log('Logged in succesfully!');
+      window.alert('Logged in succesfully!');
     } else {
-      console.log('Failed with error:');
-      console.log(login);
+      form.setErrors({ password: 'Email/password incorrect.' });
     }
   };
 
@@ -50,9 +49,23 @@ function Login() {
           <PasswordInput withAsterisk label="Password" placeholder="password" {...form.getInputProps('password')} />
 
           <Group position="right" mt="md">
+            <Button size="xs" type="button" onClick={() => navigate('/register')}>
+              Register
+            </Button>
             <Button type="submit">Login</Button>
           </Group>
         </form>
+        <Paper shadow="xs" p="sm" mt={12} withBorder>
+          <Text size="sm">
+            Default test email/password:
+            <Text>
+              <b>test@test.com</b>
+            </Text>
+            <Text>
+              <b>123456</b>
+            </Text>
+          </Text>
+        </Paper>
       </Box>
     );
 
