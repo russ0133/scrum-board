@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Draggable, Droppable } from '@hello-pangea/dnd';
-import { Button, Divider, Group, Modal } from '@mantine/core';
-import { IconChecklist, IconCirclePlus, IconPlus } from '@tabler/icons';
+import React, { useState } from 'react';
+import { Droppable } from '@hello-pangea/dnd';
+import { useClickOutside } from '@mantine/hooks';
+import { ActionIcon, Badge, Card, Center, Group, Text, TextInput } from '@mantine/core';
+import { IconCheck, IconChecklist, IconPlus } from '@tabler/icons';
+import { useForm } from '@mantine/form';
 import useMainStore from '../zustand/resolvers/MainStore';
 import TaskCard from './TaskCard';
-import { ColumnInterface, Task } from '../zustand/models/MainModel';
+import { ColumnInterface } from '../zustand/models/MainModel';
 
 interface ColumnProps {
   columnId: string;
@@ -13,45 +15,85 @@ interface ColumnProps {
 
 function Column({ columnId, column }: ColumnProps) {
   const [opened, setOpened] = useState(false);
+  const ref = useClickOutside(() => setOpened(false));
 
   const store = useMainStore();
-  function addTask() {
-    store.addTask(columnId, 'Hello');
-  }
+
+  const form = useForm({
+    initialValues: {
+      task: '',
+    },
+  });
+
+  const onSubmit = (values: any) => {
+    store.addTask(columnId, values.task);
+  };
+
   return (
     <div>
-      <Modal opened={opened} onClose={() => setOpened(false)} title="Introduce yourself!">
-        {/* FIXME: Add modal to decide task name after adding */}
-        {/* Modal content */}
-      </Modal>
-
-      <div key={columnId} className="bg-gray-300 rounded-md flex flex-col justify-between h-max min-h-[80px] shadow-sm">
-        <div className="rounded-t-md text-xl bg-neutral-700 font-bold text-white px-2 gap-1 flex flex-row items-center h-10 justify-between">
-          <div className="flex flex-row items-center gap-1">
-            <IconChecklist size={20} />
-            {column.title}
-          </div>
-          <div
-            onClick={addTask}
-            className="bg-green-600/70 hover:bg-green-600 p-[1px] transition-colors hover:cursor-pointer rounded-sm"
-          >
-            <IconPlus size={20} />
-          </div>
+      <Card shadow="sm" p="sm" radius="md">
+        <Card.Section>
+          <Group position="apart" style={{ paddingInline: 15, paddingBlock: 1, backgroundColor: 'gray' }}>
+            <Group spacing="xs">
+              <IconChecklist color="white" />
+              <Text size="lg" weight="700" color="white">
+                {column.title}
+              </Text>
+            </Group>
+            <Badge color="gray" variant="light" size="xs">
+              {column.items.length > 0 ? `${column.items.length} items` : 'empty'}
+            </Badge>
+          </Group>
+        </Card.Section>
+        <div className="-mt-2">
+          <Droppable droppableId={columnId} key={columnId}>
+            {(provided) => (
+              <ul {...provided.droppableProps} ref={provided.innerRef}>
+                {column.items.map((item, index) => (
+                  <TaskCard item={item} index={index} key={item.id} columnId={columnId} />
+                ))}
+                {provided.placeholder}
+              </ul>
+            )}
+          </Droppable>
         </div>
-        <Droppable droppableId={columnId} key={columnId}>
-          {(provided) => (
-            <ul {...provided.droppableProps} ref={provided.innerRef}>
-              {column.items.map((item, index) => (
-                <TaskCard item={item} index={index} key={item.id} columnId={columnId} />
-              ))}
-              {provided.placeholder}
-            </ul>
-          )}
-        </Droppable>
-        <div className="text-xs  px-2 mt-2 text-neutral-700 text-end  rounded-md">
-          {column.items.length > 0 ? `Items here: ${column.items.length}` : 'empty list'}
+        <div className="mt-6">
+          <Center>
+            <Group spacing="xs" ref={ref}>
+              {opened && (
+                <form onSubmit={form.onSubmit((values) => onSubmit(values))}>
+                  <Group>
+                    <TextInput
+                      autoFocus
+                      placeholder="new "
+                      radius="xl"
+                      size="xs"
+                      withAsterisk
+                      {...form.getInputProps('task')}
+                    />
+                    <ActionIcon radius="xl" color="green" type="submit" variant="filled" size="sm">
+                      <IconCheck size={18} />
+                    </ActionIcon>
+                  </Group>
+                </form>
+              )}
+              {!opened && (
+                <ActionIcon
+                  radius="xl"
+                  type="submit"
+                  variant="filled"
+                  size="sm"
+                  onClick={() => {
+                    setOpened(true);
+                  }}
+                >
+                  <IconPlus size={18} />
+                </ActionIcon>
+              )}
+            </Group>
+          </Center>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

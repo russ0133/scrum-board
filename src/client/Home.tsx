@@ -5,10 +5,8 @@ import { DragDropContext } from '@hello-pangea/dnd';
 import { AppShell, Header, Title, SimpleGrid, Container, Group, Button } from '@mantine/core';
 import useMainStore from './zustand/resolvers/MainStore';
 import { getUser, updateUserColumns } from '../server/resolvers/TaskResolver';
-import { logout } from '../server/resolvers/AuthResolver';
 import { DEFAULT_COLUMNS } from '../server/Constants';
 import Column from './components/Column';
-import ColumnMantine from './components/ColumnMantine';
 import { ColumnInterface } from './zustand/models/MainModel';
 
 export default function Home() {
@@ -116,26 +114,11 @@ export default function Home() {
         <SimpleGrid cols={3}>
           <DragDropContext onDragEnd={onDragEnd}>
             {Object.entries(store.userData.columns).map(([columnId, column]) => (
-              <ColumnMantine columnId={columnId} column={column as ColumnInterface} key={columnId} />
+              <Column columnId={columnId} column={column as ColumnInterface} key={columnId} />
             ))}
           </DragDropContext>{' '}
         </SimpleGrid>
       </Container>
     </AppShell>
-    /*     <div className="h-screen flex flex-col justify-between">
-      <div className="w-screen bg-neutral-700 text-4xl py-2 text-gray-100 px-2 flex flex-row justify-between items-center">
-        <span>Scrum</span>
-        <button type="button" onClick={logout}>
-          logout
-        </button>
-      </div>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <div className="grid grid-cols-3 lg:gap-12 h-full md:p-12 p-2 gap-2 ">
-          {Object.entries(store.userData.columns).map(([columnId, column]) => (
-            <Column columnId={columnId} column={column} key={columnId} />
-          ))}
-        </div>
-      </DragDropContext>{' '}
-    </div> */
   );
 }
